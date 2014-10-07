@@ -1,5 +1,5 @@
 var Client = require('node-ssdp').Client
-  , client = new Client();
+  , client = new Client({log: true, logLevel: "trace"});
 
 var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
 
@@ -13,5 +13,7 @@ client.on('response', function(headers, statusCode, rinfo) {
 });
 
 client.search(CAMERAREMOTEAPI_ST);
+client.search("upnp:rootdevice");
 
-client.search('ssdp:all');
+// client.search('ssdp:discover');
+// client.search('ssdp:all');
