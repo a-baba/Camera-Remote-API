@@ -39,9 +39,12 @@ DescManager.get = function(url, nodes, callback){
 
 module.exports = DescManager;
 
+
+
+
 // test code
 //
-if(!__filename.match('index.js')) {
+if(process.argv[1].match('DescManager.js')) {
   DescManager.get(
     'http://192.168.40.10:64321/scalarwebapi_dd.xml', 
     [

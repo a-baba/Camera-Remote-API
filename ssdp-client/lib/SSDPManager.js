@@ -49,7 +49,7 @@ module.export = SSDPManager;
 
 (function(){
   // belows are test code.
-  if(!__filename.match('index.js')) {
+  if(process.argv[1].match('SSDPManager.js')) {
     var ROOTDEVICE = "upnp:rootdevice";
     var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
     var reader = require('readline').createInterface({
