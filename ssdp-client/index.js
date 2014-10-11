@@ -34,11 +34,7 @@ wss.on('connection', function(ws) {
 });
 
 
-
-
-
-
-
+//////////////////////////////////////
 // belows are just for self test
 (function(global){
   var WebSocket = require('ws');
@@ -52,6 +48,6 @@ wss.on('connection', function(ws) {
   });
 
   ws.on("message", function(mesg) {
-    console.log(mesg);
+    console.log(JSON.parse(mesg));
   });
 }());
