@@ -10,6 +10,12 @@ var db = {};
 
 SSDPManager.start = function(){
   this.listen();
+  this.search("upnp:rootdevice"); // do initial M-SEARCH
+
+  // start M-SEARCH per 30 seconds.
+  setInterval(function(){
+    this.search("upnp:rootdevice");
+  }.bind(this), 30000);
 };
 
 SSDPManager.listen = function(){
@@ -45,7 +51,7 @@ SSDPManager.search = function(st){
   client.search(st);
 }
 
-module.export = SSDPManager;
+module.exports = SSDPManager;
 
 (function(){
   // belows are test code.

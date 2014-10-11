@@ -46,7 +46,7 @@ module.exports = DescManager;
 //
 if(process.argv[1].match('DescManager.js')) {
   DescManager.get(
-    'http://192.168.40.10:64321/scalarwebapi_dd.xml', 
+    'http://192.168.40.12:64321/scalarwebapi_dd.xml',
     [
       "av:X_ScalarWebAPI_ActionList_URL",
       "av:X_ScalarWebAPI_LiveView_URL"

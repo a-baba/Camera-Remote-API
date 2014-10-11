@@ -49,6 +49,10 @@ SONY_CameraAPI.prototype.get = function(method, callback){
   req.end();
 }
 
+SONY_CameraAPI.prototype.getLiveVidw = function(callback){
+  // fixme : implement accesss Live View URL and callaback data
+}
+
 SONY_CameraAPI.prototype.parseURL = function(url) {
   var a = url.split("/");
 

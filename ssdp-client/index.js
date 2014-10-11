@@ -1,19 +1,57 @@
-var Client = require('node-ssdp').Client
-  , client = new Client({log: true, logLevel: "trace"});
+var SONY_CameraAPI = require('./lib/SONY_CameraAPI')
+  , WoTController = require('./lib/WoTController')
+  , WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({port: 18888});
 
-var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
+WoTController.init();
 
-client.on('response', function(headers, statusCode, rinfo) {
-  console.log('====================================');
-  console.log('Got a response to m-search');
-  console.dir(headers);
-  console.dir(statusCode);
-  console.dir(rinfo);
-  console.log('====================================');
+var plug;
+
+wss.on('connection', function(ws) {
+  ws.on('message', function(mesg){
+    var m = JSON.parse(mesg);
+
+    console.log(m);
+
+    switch(m.method){
+    case "getDevices":
+      ws.send(JSON.stringify(WoTController.getDevices(m.urn)));
+      break;
+    case "setDevice":
+      // WoTController.setDevice(m.urn, m.uuid);
+      break;
+    case "setPlug":
+      // var device = WoTController.get(m.urn);
+      // plug = new SONY_CameraAPI(device);
+      break;
+    case "liveview":
+      // fixme: SONY_CameraAPIの liveview メソッドを呼んで、ふがほげする
+      // plug.getLiveView(function(data) { ... };
+      break;
+    }
+
+  });
 });
 
-client.search(CAMERAREMOTEAPI_ST);
-client.search("upnp:rootdevice");
 
-// client.search('ssdp:discover');
-// client.search('ssdp:all');
+
+
+
+
+
+// belows are just for self test
+(function(global){
+  var WebSocket = require('ws');
+  var ws = new WebSocket("ws://localhost:18888");
+
+  ws.on("open", function(ev){
+    var req = {"method": "getDevices", "urn": "upnp:rootdevice"};
+    setTimeout(function(){
+      ws.send(JSON.stringify(req));
+    }, 5000);
+  });
+
+  ws.on("message", function(mesg) {
+    console.log(mesg);
+  });
+}());

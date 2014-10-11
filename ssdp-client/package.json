@@ -9,6 +9,7 @@
   "author": "kensaku komatsu (kensaku.komatsu@gmail.com)",
   "license": "MIT",
   "devDependencies": {
-    "node-ssdp": "^2.0.1"
+    "node-ssdp": "^2.0.1",
+    "ws": "^0.4.32"
   }
 }
