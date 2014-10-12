@@ -1,7 +1,7 @@
 var SONY_CameraAPI = require('./lib/SONY_CameraAPI')
   , WoTController = require('./lib/WoTController')
   , WebSocketServer = require('ws').Server
-  , wss = new WebSocketServer({port: 18888});
+  , wss = new WebSocketServer({port: 28888});
 
 WoTController.init();
 
@@ -38,7 +38,7 @@ wss.on('connection', function(ws) {
 // belows are just for self test
 (function(global){
   var WebSocket = require('ws');
-  var ws = new WebSocket("ws://localhost:18888");
+  var ws = new WebSocket("ws://localhost:28888");
 
   ws.on("open", function(ev){
     var req = {"method": "getDevices", "urn": "upnp:rootdevice"};
