@@ -1,25 +1,57 @@
-
-    var ws = new WebSocket("ws://localhost:28888");
-
-    ws.onopen =  function(ev){
-      console.log('open');
-    }
-
-    ws.onclose =  function(ev){
-      console.log("close", ev);
-    }
-    ws.onerror =  function(ev){
-      console.log("error", ev);
-    }
-
-    document.querySelector("button").addEventListener("click", function(ev){
-      var req = {"method": "getDevices", "urn": "upnp:rootdevice"};
-      ws.send(JSON.stringify(req));
-    }, false);
-
-    ws.addEventListener("message", function(ev) {
-      console.log(JSON.parse(mesg));
-    }, false);
+var ws = new WebSocket("ws://localhost:28888");
 
 
+/////////////////////////////////////////
+// WebSocketのイベントハンドラー
+ws.onopen =  function(ev){
+  console.log('open', ev);
+  getDevices("upnp:rootdevice"); // just test, ホントは SONY...
+}
 
+ws.onclose =  function(ev){
+  console.log("close", ev);
+}
+ws.onerror =  function(ev){
+  console.log("error", ev);
+}
+
+ws.onmessage = function(ev) {
+  // [fixme] 受信データに応じて処理を変える
+  //
+  // getDevices ... list変更処理
+  // setDevice ... アクティブタブに、その旨 postMessage
+  console.log(JSON.parse(ev.data));
+  document.getElementById('test').innerHTML = JSON.stringify(JSON.parse(ev.data), null, "  ").replace("\n", "<br>");
+};
+
+
+////////////////////////////////////////////
+// デバイスリスト選択時のハンドラー
+// document.querySelector("li").addEventListener("click", function(ev){
+  // var uuid = ...;
+  // setDevice(uuid);
+// }, false);
+
+
+/////////////////////////////////////////////
+// デバイスリストの取得
+var getDevices = function(urn) {
+  var req = {"method": "getDevices", "urn": urn};
+  // var req = {"method": "getDevices", "urn" : "urn:schemas-sony-com:service:ScalarWebAPI:1"};
+  ws.send(JSON.stringify(req));
+};
+
+
+/////////////////////////////////////////////
+// デバイスのセット
+var setDevice = function(uuid) {
+  // var req = {"method": "getDevices", "urn" : "urn:schemas-sony-com:service:ScalarWebAPI:1", "uuid": uuid};
+  // ws.send(JSON.stringify(req));
+};
+
+
+/////////////////////////////////////////////
+// アクティブタブに通知する
+var notify = function(endpoints) {
+  // RESTアクセス用のendpoint URIを渡す。多分
+}
