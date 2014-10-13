@@ -71,8 +71,13 @@ var showDeviceList = function(list, urn) {
 
     // fixme: content scriptに対し、選択されたurn, uuidを伝える
     // chrome.tabs.ほげほげ 的な何か
-
-    // formのデフォルト動作を抑制（reload）
+    //
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {"urn": urn, "uuid": uuid}, function(response) {
+        console.log(response.farewell);
+      });
+    });
+        // formのデフォルト動作を抑制（reload）
     return false;
   });
 }
