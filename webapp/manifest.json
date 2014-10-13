@@ -11,7 +11,6 @@
   },
   "permissions": [
     "http://*/",
-    "experimental",
     {"socket": ["udp-send-to", "udp-bind", "udp-multicast-membership"]}
   ]
 }

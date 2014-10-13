@@ -1,4 +1,5 @@
 var devInfo = [
+    {name:"HDR-AS100V", url: "http://192.168.40.11:10000/sony"},
     {name:"NEX-5R",   url: "http://192.168.122.1:8080/sony"},
     {name:"HDR-AS15", url: "http://10.0.0.1:10000/sony"}
 ];
