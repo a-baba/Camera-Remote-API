@@ -10,7 +10,7 @@
   "content_scripts": [
     {
       "matches": ["http://localhost:28888/*"],
-      "js": ["lib/requestSession_sim.js", "content_script.js"]
+      "js": ["content_script.js"]
     }
   ],
   "permissions": [
