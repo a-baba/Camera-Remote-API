@@ -36,9 +36,9 @@ ws.onmessage = function(ev) {
 /////////////////////////////////////////////
 // デバイスリストの取得
 var getDevices = function(urn) {
-  var req = {"method": "getDevices", "urn": urn};
-  // var req = {"method": "getDevices", "urn" : "urn:schemas-sony-com:service:ScalarWebAPI:1"};
-  ws.send(JSON.stringify(req));
+  $.get("http://localhost:28888/getDevices/" + urn , function(res) {
+    console.log(res);
+  });
 };
 
 
