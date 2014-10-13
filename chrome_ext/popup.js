@@ -36,10 +36,48 @@ ws.onmessage = function(ev) {
 /////////////////////////////////////////////
 // デバイスリストの取得
 var getDevices = function(urn) {
-  $.get("http://localhost:28888/getDevices/" + urn , function(res) {
-    console.log(res);
+  $.getJSON("http://localhost:28888/getDevices/" + urn , function(res) {
+    console.log(JSON.parse(res));
+    showDeviceList(JSON.parse(res), urn);
   });
 };
+
+// デバイスリストの表示（時間があったら、angularもチャレンジしたいところ）
+var showDeviceList = function(list, urn) {
+  $self = $("#devices form");
+  // reset redering
+  $self.empty();
+
+  // listが"upnp:rootdevice"の時だけ特殊なので、それを対応
+  var list_ = urn === "upnp:rootdevice"
+    ? list["upnp:rootdevice"]
+    : list;
+  
+  // radio ボタンのhtml 生成
+  var arr = [];
+  for(var uuid in list_) if(list_.hasOwnProperty(uuid)) {
+    arr.push("<input type='radio' name='device' value='"+uuid+"'>" + list_[uuid]['SERVER'] + "<br>");
+  }
+  $self.html(arr.join("<br>"));
+
+  // submit ボタンを表示
+  $("<button>").prop("type", "submit").text("select").appendTo($self);
+
+  // submitイベントに対し、ハンドラを規定
+  $self.on("submit", function(ev) {
+    // 選択された uuid を取得
+    var uuid = $(this).find("input:radio[name='device']:checked").val();
+    console.log(uuid);
+
+    // fixme: content scriptに対し、選択されたurn, uuidを伝える
+    // chrome.tabs.ほげほげ 的な何か
+
+    // formのデフォルト動作を抑制（reload）
+    return false;
+  });
+}
+
+
 
 
 /////////////////////////////////////////////
