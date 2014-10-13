@@ -7,13 +7,18 @@ var SONY_CameraAPI = require('./lib/SONY_CameraAPI')
 
 WoTController.init();
 
+
+///////////////////////////////////////////
 // REST interfaces
 // (device discovery features)
+
+// getDevices
 rest_server.get('/getDevices/:urn', function(req, res, next) {
   res.send(JSON.stringify(WoTController.getDevices(req.params.urn)));
   next();
 });
 
+// setDevice
 rest_server.get('/setDevice/:urn/:uuid', function(req, res, next) {
   // WoTController.setDevice(m.urn, m.uuid);
   // var device = WoTController.get(m.urn);
@@ -22,6 +27,17 @@ rest_server.get('/setDevice/:urn/:uuid', function(req, res, next) {
   res.send("under development");
   next();
 });
+
+///////////////////////////////////////////
+// serve static page with restify
+//
+// [note] this code must be last for restify routings.
+rest_server.get(/.*/, restify.serveStatic({
+  directory: __dirname + '/public',
+  default: 'index.html'
+}));
+
+
 
 
 // WebSocket Interfaces
