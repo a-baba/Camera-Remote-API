@@ -1,20 +1,36 @@
 var DescManager = require('./DescManager');
 var http = require('http');
 
-var SONY_CameraAPI = function(device) {
+var SONY_CameraAPI = function(device, callback) {
   this.device = device;
 
   var self = this;
+
+  console.log(this.device.LOCATION)
   
+};
+
+
+SONY_CameraAPI.prototype.init = function(callback){
+
+  var self = this;
+
   DescManager.get(this.device.LOCATION,
     [
       "av:X_ScalarWebAPI_ActionList_URL",
       "av:X_ScalarWebAPI_LiveView_URL"
     ],
     function(res) {
+      console.log("in callback");
       self.endpoints = res;
+      console.log(self.endpoints);
+
+      if(typeof(callback) == "function") {
+        callback();
+      };
+
     });
-};
+}
 
 SONY_CameraAPI.prototype.getDevice = function(){
   return this.device;
@@ -49,8 +65,34 @@ SONY_CameraAPI.prototype.get = function(method, callback){
   req.end();
 }
 
-SONY_CameraAPI.prototype.getLiveVidw = function(callback){
+SONY_CameraAPI.prototype.getLiveView = function(callback){
+  console.log("getLiveView");
   // fixme : implement accesss Live View URL and callaback data
+
+  console.log("this---------------------");
+  console.log(this);
+  var endpoint = this.endpoints["av:X_ScalarWebAPI_LiveView_URL"];
+  console.log("endpoint---------------------");
+  console.log(endpoint);
+  var opts = this.parseURL(endpoint);
+  console.log("opts---------------------");
+  console.log(opts);
+
+
+  var req = http.request(opts, function(res) {
+    //res.setEncoding('utf8');
+    res.responseType = "arraybuffer";
+    res.on('data', function(chunk) {
+      if(typeof(callback) === "function") {
+        callback(chunk);
+      } else {
+        console.log(chunk);
+      }
+    });
+  });
+
+  req.end();
+
 }
 
 SONY_CameraAPI.prototype.parseURL = function(url) {

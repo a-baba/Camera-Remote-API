@@ -19,6 +19,8 @@
         <div class="content"></div>
       </section>
     </section>
+
+    <canvas id="video" width="140" height="140"></canvas>
   </body>
   <script>
     // #simifの属性変更検知をセットする(Extensionから、
@@ -49,6 +51,24 @@
     setInterface(function(res) {
       window.alert("Detected : " + JSON.stringify(res));
     });
+
+    // live view test
+    var ws = new WebSocket("ws://localhost:28888");
+    console.log(ws)
+
+    ws.onopen = function(ev){
+      var req = {"method": "liveview"};
+      setTimeout(function(){
+        ws.send(JSON.stringify(req));
+        console.log("ws://localhost:28888 send " + JSON.stringify(req))
+      }, 5000);
+    };
+
+    ws.onmessage = function(mesg) {
+      console.log("on message ==============================");
+      console.log(mesg)
+    };
+
 
   </script>
 </html>
