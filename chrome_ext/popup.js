@@ -8,15 +8,10 @@ var showDeviceList = function(list, urn) {
   // reset redering
   $self.empty();
 
-  // listが"upnp:rootdevice"の時だけ特殊なので、それを対応
-  var list_ = urn === "upnp:rootdevice"
-    ? list["upnp:rootdevice"]
-    : list;
-  
   // radio ボタンのhtml 生成
   var arr = [];
-  for(var uuid in list_) if(list_.hasOwnProperty(uuid)) {
-    arr.push("<label><input type='radio' name='device' value='"+uuid+"'>" + list_[uuid]['SERVER'] + "</label>");
+  for(var uuid in list) if(list.hasOwnProperty(uuid)) {
+    arr.push("<label><input type='radio' name='device' value='"+uuid+"'>" + list[uuid]['SERVER'] + "</label>");
   }
 
   arr.push("<br>"); // add final <br>, so that button displays new line
@@ -45,12 +40,14 @@ var showDeviceList = function(list, urn) {
 ////////////////////////////////////////////////////////////////////////
 
 // configuration
-var NODE_URL = "http://localhost:28888";
+var NODE_URL = "http://localhost:28888/discovery";
 var SONY_CAMERA_URN = "urn:schemas-sony-com:service:ScalarWebAPI:1";
+// var SONY_CAMERA_URN = "upnp:rootdevice";
 
 // アクティブタブに選択した urn と uuid を通知する
 //
 var notify2tab = function(urn, uuid) {
+  console.log(urn, uuid);
   // RESTアクセス用のendpoint URIを渡す。多分
   chrome.tabs.query(
     { "active": true, "currentWindow": true },
@@ -72,7 +69,7 @@ var notify2tab = function(urn, uuid) {
 // デバイスリストの取得
 //
 var getDevices = function(urn) {
-  $.getJSON( NODE_URL + "/getDevices/" + urn , function(res) {
+  $.post( NODE_URL + "/getDevices", {"urn": urn} , function(res) {
     console.log(JSON.parse(res));
     showDeviceList(JSON.parse(res), urn);
   });
@@ -84,16 +81,11 @@ var getDevices = function(urn) {
 // セットが完了したら、アクティブWebページにurnとuuidを通達する
 //
 var setDevice = function(urn, uuid) {
-  // var req = {"method": "getDevices", "urn" : "urn:schemas-sony-com:service:ScalarWebAPI:1", "uuid": uuid};
-  // ws.send(JSON.stringify(req));
-  //
-  // var url = [NODE_URL, "setDevice", urn, uuid].join("/");
-  // $.getJSON( url, function(res) {
-  //   notify2tab( urn, uuid );
-  // });
-
-  // just debugging...
-  notify2tab(urn, uuid);
+  var url = [ NODE_URL, "setDevice" ].join("/");
+  $.post( url, {"urn": urn, "uuid": uuid}, function(res) {
+    console.log(res);
+    notify2tab( urn, uuid );
+  });
 };
 
 

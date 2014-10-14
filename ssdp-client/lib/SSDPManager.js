@@ -16,8 +16,6 @@ SSDPManager.start = function(){
   setInterval(function(){
     this.search("upnp:rootdevice");
   }.bind(this), 30000);
-
-  this.startConsole();
 };
 
 SSDPManager.listen = function(){
@@ -48,38 +46,6 @@ SSDPManager.get = function(target){
   return db[target] || {};
 }
 
-// start stdin interface to check current discovered devices
-SSDPManager.startConsole = function(){
-  var ROOTDEVICE = "upnp:rootdevice";
-  var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
-
-  var reader = require('readline').createInterface({
-    input : process.stdin,
-    output : process.stdout
-  });
-
-  // start SSDP Manager
-  var self = this;
-  reader.on('line', function(line) {
-    switch(line) {
-    case 'show':
-      console.log(self.get());
-      break;
-    case 'sony':
-      console.log(self.get(CAMERAREMOTEAPI_ST));
-      break;
-    case 'search':
-      console.log(self.search(SSDPManager.search(ROOTDEVICE)));
-      break;
-    case 'help':
-    default:
-      console.log("command - [show/sony/search]");
-    }
-  });
-
-  console.log("command - [show/sony/search]");
-}
-
 
 SSDPManager.search = function(st){
   client.search(st);
@@ -91,10 +57,36 @@ module.exports = SSDPManager;
   // belows are test code.
   if(process.argv[1].match('SSDPManager.js')) {
     var ROOTDEVICE = "upnp:rootdevice";
+    var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
+
+    var reader = require('readline').createInterface({
+      input : process.stdin,
+      output : process.stdout
+    });
+
     // start SSDP Manager
     SSDPManager.start();
     SSDPManager.search(ROOTDEVICE);
 
-    SSDPManager.startConsole();
-  }
+    // define listener
+    var self = this;
+    reader.on('line', function(line) {
+      switch(line) {
+      case 'show':
+        console.log(SSDPManager.get());
+        break;
+      case 'sony':
+        console.log(SSDPManager.get(CAMERAREMOTEAPI_ST));
+        break;
+      case 'search':
+        console.log(SSDPManager.search(SSDPManager.search(ROOTDEVICE)));
+        break;
+      case 'help':
+      default:
+        console.log("command - [show/sony/search]");
+      }
+    });
+
+
+    }
 }());

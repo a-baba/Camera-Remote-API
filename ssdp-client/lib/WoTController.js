@@ -10,26 +10,18 @@ var WoTController = { } // static obj.
 WoTController.init = function(){
   // start SSDPManager
   SSDPManager.start();
+
+  // startConsole
+  this.startConsole();
 }
 
 var selects = {};
 
 // get device list for urn
 WoTController.getDevices = function(urn){
-  var _TMPRES = { 'uuid:00000000-0005-0010-8000-fcc2de538943::urn:schemas-sony-com:service:ScalarWebAPI:1': { HOST: '239.255.255.250:1900', 'CACHE-CONTROL': 'max-age=1800', LOCATION: 'http://192.168.40.12:64321/scalarwebapi_dd.xml', NT: 'urn:schemas-sony-com:service:ScalarWebAPI:1', NTS: 'ssdp:alive', SERVER: 'UPnP/1.0 SonyImagingDevice/1.0', USN: 'uuid:00000000-0005-0010-8000-fcc2de538943::urn:schemas-sony-com:service:ScalarWebAPI:1', 'X-AV-PHYSICAL-UNIT-INFO': 'pa=\"\"; pl=;', 'X-AV-SERVER-INFO': 'av=5.0; hn=\"\"; cn=\"Sony Corporation\"; mn=\"SonyImagingDevice\"; mv=\"1.0\";' }
-  } 
- 
-  if(urn === "urn:schemas-sony-com:service:ScalarWebAPI:1") {
-    var res = _TMPRES;
+  if(!urn) return false;
 
-    // fixme 本当は、ここでSSDPManagerから上のurnのリストを取りに行く
-  } else if(urn === "upnp:rootdevice" || urn === "ssdp:all" ) {
-    var res = SSDPManager.get();
-  } else {
-    var res = null;
-  }
-
-  return res;
+  return SSDPManager.get(urn);
 }
 
 
@@ -39,9 +31,48 @@ WoTController.setDevice = function(urn, uuid){
   selects[urn] = devices[uuid];
 }
 
-WoTController.get = function(urn){
+// get selected devices
+WoTController.getSelected = function(urn){
   return selects[urn];
 }
+
+// start stdin interface to check current discovered devices
+WoTController.startConsole = function(){
+  var ROOTDEVICE = "upnp:rootdevice";
+  var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
+
+  var reader = require('readline').createInterface({
+    input : process.stdin,
+    output : process.stdout
+  });
+
+  // start SSDP Manager
+  var self = this;
+  reader.on('line', function(line) {
+    switch(line) {
+    case 'show':
+      console.log(self.getDevices(ROOTDEVICE));
+      break;
+    case 'sony':
+      console.log(self.getDevices(CAMERAREMOTEAPI_ST));
+      break;
+    case 'selected':
+      console.log(CAMERAREMOTEAPI_ST, self.getSelected(CAMERAREMOTEAPI_ST));
+      console.log(ROOTDEVICE, self.getSelected(ROOTDEVICE));
+      break;
+    case 'search':
+      console.log(SSDPManager.search(SSDPManager.search(ROOTDEVICE)));
+      break;
+    case 'help':
+    default:
+      console.log("command - [show/sony/selected/search]");
+    }
+  });
+
+  console.log("command - [show/sony/search]");
+}
+
+
 
 module.exports = WoTController;
 
