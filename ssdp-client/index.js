@@ -5,6 +5,8 @@ var SONY_CameraAPI = require('./lib/SONY_CameraAPI')
   , rest_server = restify.createServer()
   , wss = new WebSocketServer({server: rest_server})
 
+rest_server.use(restify.bodyParser());
+
 WoTController.init();
 
 
@@ -13,18 +15,25 @@ WoTController.init();
 // (device discovery features)
 
 // getDevices
-rest_server.get('/getDevices/:urn', function(req, res, next) {
-  res.send(JSON.stringify(WoTController.getDevices(req.params.urn)));
+rest_server.post('/discovery/getDevices', function(req, res, next) {
+  var urn = req.params.urn;
+
+  var result = JSON.stringify(WoTController.getDevices(urn));
+
+  res.send(result);
   next();
 });
 
 // setDevice
-rest_server.get('/setDevice/:urn/:uuid', function(req, res, next) {
-  // WoTController.setDevice(m.urn, m.uuid);
-  // var device = WoTController.get(m.urn);
-  //
-  // plug = new SONY_CameraAPI(device);
-  res.send("under development");
+rest_server.post('/discovery/setDevice', function(req, res, next) {
+  var urn = req.params.urn
+    , uuid = req.params.uuid
+
+  WoTController.setDevice(urn, uuid);
+  var device = WoTController.getSelected(urn);
+
+  //plug = new SONY_CameraAPI(device);
+  res.send(JSON.stringify(device));
   next();
 });
 
@@ -76,25 +85,6 @@ rest_server.listen(28888, function() {
 // belows are just for self test
 (function(global){
   // REST test
-  var http = require('http');
-
-  setTimeout(function() {
-    http.get('http://localhost:28888/getDevices/upnp:rootdevice', function(res) {
-
-      res.setEncoding('utf8');
-      
-      var data = "";
-      res.on('data', function(chunk) {
-        data += chunk;
-      });
-
-      res.on('end', function() {
-        console.log(data);
-      });
-    });
-  }, 5000);
-  
-
   // live view test
   var WebSocket = require('ws');
   var ws = new WebSocket("ws://localhost:28888");

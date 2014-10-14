@@ -58,6 +58,7 @@ module.exports = SSDPManager;
   if(process.argv[1].match('SSDPManager.js')) {
     var ROOTDEVICE = "upnp:rootdevice";
     var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
+
     var reader = require('readline').createInterface({
       input : process.stdin,
       output : process.stdout
@@ -67,6 +68,8 @@ module.exports = SSDPManager;
     SSDPManager.start();
     SSDPManager.search(ROOTDEVICE);
 
+    // define listener
+    var self = this;
     reader.on('line', function(line) {
       switch(line) {
       case 'show':
@@ -83,5 +86,7 @@ module.exports = SSDPManager;
         console.log("command - [show/sony/search]");
       }
     });
-  }
+
+
+    }
 }());
