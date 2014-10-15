@@ -1,3 +1,5 @@
+console.log("content_script");
+
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log('got message'); console.dir(request);
   // div#simifの data-urn と data-uuid属性を変更することで、
