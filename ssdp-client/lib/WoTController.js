@@ -19,7 +19,7 @@ var selects = {};
 
 // get device list for urn
 WoTController.getDevices = function(urn){
-  if(!urn) return false;
+ if(!urn) return false;
 
   return SSDPManager.get(urn);
 }
@@ -89,6 +89,7 @@ if(process.argv[1].match("WoTcontroller.js")) {
   switch(urn) {
   case "urn:schemas-sony-com:service:ScalarWebAPI:1":
     var plug = new SONY_CameraAPI(device);
+    console.log(plug);
     break;
   default:
     console.log("unknown urn");
