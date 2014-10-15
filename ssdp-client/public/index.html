@@ -20,7 +20,7 @@
       </section>
     </section>
 
-    <img id="liveview"></canvas>
+    <img id="liveview"><canvas></canvas>
   </body>
   <script>
     // #simifの属性変更検知をセットする(Extensionから、
@@ -70,6 +70,8 @@
       var url = window.URL.createObjectURL(mesg.data);
       console.log(url);
       $("#liveview").attr("src", url);
+      // todo canvasでdrawImageする
+      // ref: http://html5.jp/canvas/how6.html
     };
 
 
