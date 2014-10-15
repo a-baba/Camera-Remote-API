@@ -35,7 +35,7 @@ rest_server.post('/discovery/setDevice', function(req, res, next) {
   WoTController.setDevice(urn, uuid);
   var device = WoTController.getSelected(urn);
 
-  //plug = new SONY_CameraAPI(device);
+  plug = new SONY_CameraAPI(device);
   res.send(JSON.stringify(device));
   next();
 });
@@ -71,19 +71,11 @@ wss.on('connection', function(ws) {
 
     switch(m.method){
     case "liveview":
-      // 今は決め打ち
-      var urn = "urn:schemas-sony-com:service:ScalarWebAPI:1";
-
-      WoTController.setDevice(urn, "uuid:00000000-0005-0010-8000-fcc2de538943::urn:schemas-sony-com:service:ScalarWebAPI:1"); 
-
-      var device = WoTController.get(urn);
-      console.log(device);
+      if(!plug) {
+        ws.send("device not selected, yet");
+        break;
+      }
       
-      var plug = new SONY_CameraAPI(device);
-
-      // ここまで決め打ち部分
-
-
       // sony camの初期化
       plug.init(function(){
 
@@ -218,7 +210,9 @@ rest_server.listen(28888, function() {
 //////////////////////////////////////
 // belows are just for self test
 (function(global){
+  // do nothing.
   if(true) return;
+
   // REST test
   var http = require('http');
 

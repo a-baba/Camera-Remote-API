@@ -49,30 +49,30 @@
 
     // setInterfaceのテスト
     setInterface(function(res) {
-      window.alert("Detected : " + JSON.stringify(res));
+      startLiveView();
     });
 
-    // live view test
-    var ws = new WebSocket("ws://localhost:28888");
-    console.log(ws)
+    var startLiveView = function(){
+      // live view test
+      var ws = new WebSocket("ws://localhost:28888");
+      console.log(ws)
 
-    ws.onopen = function(ev){
-      var req = {"method": "liveview"};
-      setTimeout(function(){
+      ws.onopen = function(ev){
+        var req = {"method": "liveview"};
         ws.send(JSON.stringify(req));
         console.log("ws://localhost:28888 send " + JSON.stringify(req))
-      }, 5000);
-    };
+      };
 
-    ws.onmessage = function(mesg) {
-      console.log("on message ================================================");
-      console.log(mesg.data);
-      var url = window.URL.createObjectURL(mesg.data);
-      console.log(url);
-      $("#liveview").attr("src", url);
-      // todo canvasでdrawImageする
-      // ref: http://html5.jp/canvas/how6.html
-    };
+      ws.onmessage = function(mesg) {
+        console.log("on message ================================================");
+        console.log(mesg.data);
+        var url = window.URL.createObjectURL(mesg.data);
+        console.log(url);
+        $("#liveview").attr("src", url);
+        // todo canvasでdrawImageする
+        // ref: http://html5.jp/canvas/how6.html
+      };
+    }
 
 
   </script>
