@@ -20,7 +20,7 @@
       </section>
     </section>
 
-    <canvas id="video" width="140" height="140"></canvas>
+    <img id="liveview"></canvas>
   </body>
   <script>
     // #simifの属性変更検知をセットする(Extensionから、
@@ -65,8 +65,11 @@
     };
 
     ws.onmessage = function(mesg) {
-      console.log("on message ==============================");
-      console.log(mesg)
+      console.log("on message ================================================");
+      console.log(mesg.data);
+      var url = window.URL.createObjectURL(mesg.data);
+      console.log(url);
+      $("#liveview").attr("src", url);
     };
 
 
