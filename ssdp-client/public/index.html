@@ -4,6 +4,9 @@
     <meta charset="utf-8">
     <script src="/frameworks/jquery-1.11.1.min.js"></script>
     <script src="/lib/requestSession_sim.js"></script>
+    <script src="/shim/session_shim.js"></script>
+    <script src="/shim/shim.js"></script>
+    <script src="script.js"></script>
     <style>
       #simif { display: none; }
     </style>
@@ -46,34 +49,6 @@
       // indicates target and option
       observer.observe(target, { attributes: true });
     }
-
-    // setInterfaceのテスト
-    setInterface(function(res) {
-      startLiveView();
-    });
-
-    var startLiveView = function(){
-      // live view test
-      var ws = new WebSocket("ws://localhost:28888");
-      console.log(ws)
-
-      ws.onopen = function(ev){
-        var req = {"method": "liveview"};
-        ws.send(JSON.stringify(req));
-        console.log("ws://localhost:28888 send " + JSON.stringify(req))
-      };
-
-      ws.onmessage = function(mesg) {
-        console.log("on message ================================================");
-        console.log(mesg.data);
-        var url = window.URL.createObjectURL(mesg.data);
-        console.log(url);
-        $("#liveview").attr("src", url);
-        // todo canvasでdrawImageする
-        // ref: http://html5.jp/canvas/how6.html
-      };
-    }
-
 
   </script>
 </html>

@@ -4,8 +4,9 @@
 
   navigator.presentation = navigator.presentation || {};
 
-  navigator.presentation.requestSession = function(url) {
-    document.body.style.backgroundColor=url;   // just dummy ;-)
+  navigator.presentation.startSession = function(url, id) {
+  	var session = new Session();
+  	return session;
   }
 
 }());
