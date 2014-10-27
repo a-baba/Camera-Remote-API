@@ -1,14 +1,15 @@
 
 var Client = require('node-ssdp').Client
   // , client = new Client({log: true, logLevel: "trace"});
-  , client = new Client({});
+  , client = new Client({})
+  , EventEmitter = require('events').EventEmitter
+  , util = require('util')
 
 
-var SSDPManager = {};
 
 var db = {};
 
-SSDPManager.start = function(){
+var SSDPManager = function(){
   this.listen();
   this.search("upnp:rootdevice"); // do initial M-SEARCH
 
@@ -16,9 +17,15 @@ SSDPManager.start = function(){
   setInterval(function(){
     this.search("upnp:rootdevice");
   }.bind(this), 30000);
+
+  return this.ev;
 };
 
-SSDPManager.listen = function(){
+util.inherits(SSDPManager, EventEmitter);
+
+SSDPManager.prototype.listen = function(){
+  var self = this;
+
   // M-SEARCH response
   client.on('response', function(headers, statusCode, rinfo) {
     if(!db[headers.ST]) db[headers.ST] = {};
@@ -31,6 +38,8 @@ SSDPManager.listen = function(){
     if(!db[headers.NT]) db[headers.NT] = {};
 
     if(!db[headers.NT][headers.USN]) db[headers.NT][headers.USN] = headers;
+
+    self.emit('notify', {"NT": headers.NT, "headers": headers});
   });
 
   // NOTIFY (byebye)
@@ -40,14 +49,14 @@ SSDPManager.listen = function(){
 }
 
 // get discovered devices
-SSDPManager.get = function(target){
+SSDPManager.prototype.get = function(target){
   if(!target) return db;
 
   return db[target] || {};
 }
 
 
-SSDPManager.search = function(st){
+SSDPManager.prototype.search = function(st){
   client.search(st);
 }
 

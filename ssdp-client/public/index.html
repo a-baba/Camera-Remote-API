@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <script src="/frameworks/jquery-1.11.1.min.js"></script>
     <script src="/lib/requestSession_sim.js"></script>
+    <script src="/shim/presentation_shim.js"></script>
     <script src="/shim/session_shim.js"></script>
     <script src="/shim/shim.js"></script>
     <script src="script.js"></script>
@@ -18,6 +19,9 @@
         <h1>WoT demo</h1>
       </header>
 
+      <section id="button">
+        <button id="extern" disabled>use external camera</button>
+      </section>
       <section id="contents">
         <div class="content"></div>
       </section>
@@ -26,28 +30,16 @@
     <img id="liveview"><canvas></canvas>
   </body>
   <script>
-    // #simifの属性変更検知をセットする(Extensionから、
-    // データを貰うために用いる
-    function setInterface(callback) {
-      // interface node
-      var target = document.querySelector("#simif");
-
-      // create an observer instance
-      var observer = new MutationObserver(function(mutations){
-        var res = {};
-        mutations.forEach(function(mutation) {
-          var attr = mutation.attributeName;
-          res[attr] = target.getAttribute(attr);
-        });
-        if(typeof(callback) === "function") {
-          callback(res);
-        } else {
-          console.log(res);
-        }
+    navigator.presentation.onavailablechange = function(){
+      $("#button button")[0].disabled = false;
+      console.log('@onavailablechange');
+    }
+    document.querySelector("button#extern").onclick = function(){
+      navigator.presentation
+      .startSession('urn:schemas-sony-com:service:ScalarWebAPI:1')
+      .then(function(sess) {
+        alert("startSession succeeded");
       });
-
-      // indicates target and option
-      observer.observe(target, { attributes: true });
     }
 
   </script>
