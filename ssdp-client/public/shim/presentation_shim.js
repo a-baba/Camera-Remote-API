@@ -114,10 +114,11 @@
   presentation_.showPicker__ = function(resolve, urn, devices) {
     var picker = document.createElement("form");
     picker.style.width = "320px";
-    picker.style.padding = "10px";
+    picker.style.padding = "20px 10px";
     picker.style.background = "white";
     picker.style.border  = "1px solid black";
     picker.style.position  = "absolute";
+    picker.style.zIndex  = "10240";
     picker.style.left = "100px";
     picker.style.top = "0px";
 
