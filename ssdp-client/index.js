@@ -7,7 +7,7 @@ var SONY_CameraAPI = require('./lib/SONY_CameraAPI')
 
 rest_server.use(restify.bodyParser());
 
-WoTController.init();
+var wotcontroller = new WoTController();
 
 var COMMON_HEADER_SIZE = 8;
 var PAYLOAD_HEADER_SIZE = 128;
@@ -21,7 +21,7 @@ var PAYLOAD_HEADER_SIZE = 128;
 rest_server.post('/discovery/getDevices', function(req, res, next) {
   var urn = req.params.urn;
 
-  var result = JSON.stringify(WoTController.getDevices(urn));
+  var result = JSON.stringify(wotcontroller.getDevices(urn));
 
   res.send(result);
   next();
@@ -32,8 +32,8 @@ rest_server.post('/discovery/setDevice', function(req, res, next) {
   var urn = req.params.urn
     , uuid = req.params.uuid
 
-  WoTController.setDevice(urn, uuid);
-  var device = WoTController.getSelected(urn);
+  wotcontroller.setDevice(urn, uuid);
+  var device = wotcontroller.getSelected(urn);
 
   plug = new SONY_CameraAPI(device);
   res.send(JSON.stringify(device));
@@ -204,6 +204,35 @@ wss.on('connection', function(ws) {
 
 rest_server.listen(28888, function() {
   console.log('%s listening at %s', rest_server.name, rest_server.url);
+});
+
+
+///////////////////////////////////////
+// another websocket server (28887)
+var AN_PORT = 28887;
+var wss28887 = new WebSocketServer({port:AN_PORT});
+
+wss28887.on('connection', function(ws) {
+  ws.on('message', function(mesg) {
+    console.log(mesg);
+    var m = JSON.parse(mesg);
+    // fixme : static urn
+    var SONY_CAMERA_URN = "urn:schemas-sony-com:service:ScalarWebAPI:1";
+
+    console.log(m.type);
+    if(m.type === "reqAvailableChange") {
+      console.log("@set event listener for " + m.type);
+      wotcontroller.on("AvailableChange", function(ev) {
+        var res = {
+          "type": "resAvailableChange",
+          "devices": wotcontroller.getDevices(SONY_CAMERA_URN)
+        }
+        console.log("@onavailablechange " + SONY_CAMERA_URN);
+        console.dir(res);
+        ws.send(JSON.stringify(res));
+      });
+    }
+  });
 });
 
 
