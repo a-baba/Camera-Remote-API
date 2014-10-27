@@ -1,43 +1,55 @@
 
 var SONY_CameraAPI = require('./SONY_CameraAPI')  // fixme このライブラリは、テストのためだけにロードしている。本当はいらない
-  , SSDPManager = require('./SSDPManager');
+  , SSDPManager = require('./SSDPManager')
+  , util = require('util')
+  , EventEmitter = require('events').EventEmitter
 
 
-var WoTController = { } // static obj.
-
-
-
-WoTController.init = function(){
+var WoTController = function(){
   // start SSDPManager
-  SSDPManager.start();
+  this.ssdpmanager = new SSDPManager();
+
+  // emit event when notify receive for sony devices
+  var self = this;
+
+  this.ssdpmanager.on('notify', function(res) {
+    console.log("@notify: " + res.NT);
+    if(res.NT === 'urn:schemas-sony-com:service:ScalarWebAPI:1') {
+      console.dir(res);
+      self.emit('AvailableChange', res);
+    }
+  });
 
   // startConsole
   this.startConsole();
 }
 
+util.inherits(WoTController, EventEmitter);
+
+
 var selects = {};
 
 // get device list for urn
-WoTController.getDevices = function(urn){
+WoTController.prototype.getDevices = function(urn){
  if(!urn) return false;
 
-  return SSDPManager.get(urn);
+  return this.ssdpmanager.get(urn);
 }
 
 
 // set device for urn
-WoTController.setDevice = function(urn, uuid){
+WoTController.prototype.setDevice = function(urn, uuid){
   var devices = this.getDevices(urn);
   selects[urn] = devices[uuid];
 }
 
 // get selected devices
-WoTController.getSelected = function(urn){
+WoTController.prototype.getSelected = function(urn){
   return selects[urn];
 }
 
 // start stdin interface to check current discovered devices
-WoTController.startConsole = function(){
+WoTController.prototype.startConsole = function(){
   var ROOTDEVICE = "upnp:rootdevice";
   var CAMERAREMOTEAPI_ST = 'urn:schemas-sony-com:service:ScalarWebAPI:1';
 
