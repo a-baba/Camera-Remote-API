@@ -9,6 +9,7 @@
     <style>
       body {margin-top: 36px;}
       #simif { display: none; }
+      #button { margin-bottom: 3px; }
     </style>
   </head>
   <body>
@@ -64,7 +65,6 @@
   <script>
     navigator.presentation.onavailablechange = function(){
       $("#button button")[0].disabled = false;
-      console.log('@onavailablechange');
     }
     document.querySelector("button#extern").onclick = function(){
       navigator.presentation
@@ -96,10 +96,7 @@
       session.onmessage = function(mesg) {
         var url = window.URL.createObjectURL(mesg.data);
         $("#liveview").attr("src", url);
-        // todo canvasでdrawImageする
-        // ref: http://html5.jp/canvas/how6.html
       };
-
     }
 
 
