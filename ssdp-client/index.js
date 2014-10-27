@@ -21,7 +21,7 @@ var PAYLOAD_HEADER_SIZE = 128;
 rest_server.post('/discovery/getDevices', function(req, res, next) {
   var urn = req.params.urn;
   console.log("@getDevices - ", urn);
-
+  
   var result = JSON.stringify(wotcontroller.getDevices(urn));
 
   res.send(result);
@@ -62,7 +62,7 @@ wss.on('connection', function(ws) {
   ws.on('message', function(mesg){
     var m = JSON.parse(mesg);
 
-    console.log("wss on message")
+    console.log("wss received a message");
     console.log(m);
 
     // 注記）デバイス選択パートは、前半のREST Interface
@@ -70,8 +70,31 @@ wss.on('connection', function(ws) {
     // WebSocketだとめんどいので）ので、ここにあるのは
     // liveviewのみとした
 
-    switch(m.method){
+    var method;
+
+    if(m.message == "requestSession"){
+
+      var urn = m.urn
+        , uuid = m.uuid;
+    console.log(urn);
+    console.log(uuid);
+
+
+      wotcontroller.setDevice(urn, uuid);
+      var device = wotcontroller.getSelected(urn);
+
+      plug = new SONY_CameraAPI(device);
+      console.log(device);
+      ws.send(JSON.stringify(device));
+      //next();
+    }
+    if(m.message == "getLiveView"){
+      method = "liveview";
+    }
+
+    switch(method){
     case "liveview":
+
       if(!plug) {
         ws.send("device not selected, yet");
         break;

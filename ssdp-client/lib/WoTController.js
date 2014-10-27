@@ -40,6 +40,7 @@ WoTController.prototype.getDevices = function(urn){
 // set device for urn
 WoTController.prototype.setDevice = function(urn, uuid){
   var devices = this.getDevices(urn);
+  console.log(devices);
   selects[urn] = devices[uuid];
 }
 

@@ -5,8 +5,6 @@ var SONY_CameraAPI = function(device, callback) {
   this.device = device;
 
   var self = this;
-
-  console.log(this.device.LOCATION)
   
 };
 

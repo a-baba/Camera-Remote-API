@@ -70,21 +70,34 @@
       navigator.presentation
       .startSession('urn:schemas-sony-com:service:ScalarWebAPI:1')
       .then(function(sess) {
-        alert("startSession succeeded");
+        alert("after startSession")
+        setSession(sess);
       });
     }
-    var startLiveView = function(){
-      // live view test
-      var ws = new WebSocket("ws://localhost:28888");
-      console.log(ws)
 
-      ws.onopen = function(ev){
-        var req = {"method": "liveview"};
-        ws.send(JSON.stringify(req));
-        console.log("ws://localhost:28888 send " + JSON.stringify(req))
+    var session = null;
+
+    function setSession(theSession) {
+      console.log("setSesion")
+      // NOTE: We could instead close the current session.
+      if (session) return;
+      session = theSession;
+      localStorage['presentationId'] = session.id;
+
+      console.log(session);
+
+      session.onstatechange = function() {
+        switch (session.state) {
+          case 'connected':
+            session.postMessage("getLiveView");
+            break;
+          case 'disconnected':
+            console.log('Disconnected.');
+            break;
+        }
       };
 
-      ws.onmessage = function(mesg) {
+      session.onmessage = function(mesg) {
         console.log("on message ================================================");
         console.log(mesg.data);
         var url = window.URL.createObjectURL(mesg.data);
@@ -93,6 +106,10 @@
         // todo canvasでdrawImageする
         // ref: http://html5.jp/canvas/how6.html
       };
+
+
+      console.log(session.onstatechange);
+
     }
 
 
