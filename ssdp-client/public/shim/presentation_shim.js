@@ -153,7 +153,7 @@
         console.log(selected);
 
         /////////////////////////////////////////
-        var session = {}; // todo: ここで、さっくる作成のsessionオブジェクトを渡す
+        var session = new Session(); // todo: ここで、さっくる作成のsessionオブジェクトを渡す
         document.body.removeChild(picker);
         resolve(session);
       }

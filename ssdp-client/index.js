@@ -80,8 +80,8 @@ wss.on('connection', function(ws) {
     console.log(uuid);
 
 
-      WoTController.setDevice(urn, uuid);
-      var device = WoTController.getSelected(urn);
+      wotcontroller.setDevice(urn, uuid);
+      var device = wotcontroller.getSelected(urn);
 
       plug = new SONY_CameraAPI(device);
       console.log(device);
