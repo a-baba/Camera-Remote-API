@@ -9,6 +9,7 @@
     <style>
       body {margin-top: 36px;}
       #simif { display: none; }
+      #button { margin-bottom: 3px; }
     </style>
   </head>
   <body>
@@ -64,13 +65,11 @@
   <script>
     navigator.presentation.onavailablechange = function(){
       $("#button button")[0].disabled = false;
-      console.log('@onavailablechange');
     }
     document.querySelector("button#extern").onclick = function(){
       navigator.presentation
       .startSession('urn:schemas-sony-com:service:ScalarWebAPI:1')
       .then(function(sess) {
-        alert("after startSession")
         setSession(sess);
       });
     }
@@ -78,13 +77,10 @@
     var session = null;
 
     function setSession(theSession) {
-      console.log("setSesion")
       // NOTE: We could instead close the current session.
       if (session) return;
       session = theSession;
       localStorage['presentationId'] = session.id;
-
-      console.log(session);
 
       session.onstatechange = function() {
         switch (session.state) {
@@ -98,18 +94,9 @@
       };
 
       session.onmessage = function(mesg) {
-        console.log("on message ================================================");
-        console.log(mesg.data);
         var url = window.URL.createObjectURL(mesg.data);
-        console.log(url);
         $("#liveview").attr("src", url);
-        // todo canvasでdrawImageする
-        // ref: http://html5.jp/canvas/how6.html
       };
-
-
-      console.log(session.onstatechange);
-
     }
 
 
