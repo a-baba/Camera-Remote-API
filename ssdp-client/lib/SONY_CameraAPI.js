@@ -5,6 +5,8 @@ var SONY_CameraAPI = function(device, callback) {
   this.device = device;
 
   var self = this;
+
+  this.destroy_flag = false;
   
 };
 
@@ -76,15 +78,22 @@ SONY_CameraAPI.prototype.getLiveView = function(callback){
   console.log("opts---------------------");
   console.log(opts);
 
+  var self = this;
 
   var req = http.request(opts, function(res) {
     //res.setEncoding('utf8');
     res.responseType = "arraybuffer";
     res.on('data', function(chunk) {
-      if(typeof(callback) === "function") {
-        callback(chunk);
-      } else {
-        console.log(chunk);
+      if(self.destroy_flag){
+        req.abort();
+        self.destroy_flag = false;
+      }
+      else{
+        if(typeof(callback) === "function") {
+          callback(chunk);
+        } else {
+          console.log(chunk);
+        }
       }
     });
   });
@@ -125,5 +134,9 @@ var methods = {
     "version": "1.0"
   }
 }
+
+SONY_CameraAPI.prototype.destroy = function() {
+  this.destroy_flag = true;
+};
 
 module.exports = SONY_CameraAPI;

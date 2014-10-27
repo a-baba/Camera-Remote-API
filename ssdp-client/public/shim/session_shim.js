@@ -19,12 +19,9 @@ var Session = {};
 		var self = this;
 		this.state;
 
-		//ws = wsocket;
-		console.log(ws);
-
 		ws.onopen = function(ev){
 			console.log(self);
-			console.log("connected");
+			console.log("connected!");
 			self.state = "connected";
 			self.onstatechange();
 		};
@@ -33,10 +30,14 @@ var Session = {};
 
 			console.log("shim received message ================================================");
 			console.log(mesg);
-			console.log(mesg.message);
 
 			self.onmessage(mesg);
 		};
+
+		ws.onclose = function(mesg){
+			console.log("socket close!!")
+			ws.close();
+		}
 	};
 
 	

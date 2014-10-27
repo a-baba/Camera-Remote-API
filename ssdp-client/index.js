@@ -59,6 +59,12 @@ rest_server.get(/.*/, restify.serveStatic({
 var plug;
 
 wss.on('connection', function(ws) {
+  console.dir(ws);
+
+  ws.on('close', function(){
+    plug.destroy();
+  });
+
   ws.on('message', function(mesg){
     var m = JSON.parse(mesg);
 
@@ -212,8 +218,10 @@ wss.on('connection', function(ws) {
 
           //JPEGデータが集まったらWSで送る
           if(img_data_size <= img_off){
-            console.log("send array buffer")
-            ws.send(img_ab);
+            console.log("send array buffer");
+            if(ws.readyState === 1){
+              ws.send(img_ab);
+            }
           }
         });
       });
