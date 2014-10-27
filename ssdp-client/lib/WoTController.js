@@ -11,6 +11,7 @@ var WoTController = function(){
 
   // emit event when notify receive for sony devices
   var self = this;
+
   this.ssdpmanager.on('notify', function(res) {
     console.log("@notify: " + res.NT);
     if(res.NT === 'urn:schemas-sony-com:service:ScalarWebAPI:1') {

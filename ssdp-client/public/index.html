@@ -16,6 +16,9 @@
         <h1>WoT demo</h1>
       </header>
 
+      <section id="button">
+        <button id="extern" disabled>use external camera</button>
+      </section>
       <section id="contents">
         <div class="content"></div>
       </section>
@@ -24,6 +27,17 @@
     <img id="liveview"><canvas></canvas>
   </body>
   <script>
+    navigator.presentation.onavailablechange = function(){
+      $("#button button")[0].disabled = false;
+      console.log('@onavailablechange');
+    }
+    document.querySelector("button#extern").onclick = function(){
+      navigator.presentation
+      .startSession('urn:schemas-sony-com:service:ScalarWebAPI:1')
+      .then(function(sess) {
+        alert("startSession succeeded");
+      });
+    }
     var startLiveView = function(){
       // live view test
       var ws = new WebSocket("ws://localhost:28888");

@@ -44,7 +44,6 @@
     var self = this;
     this.ws_.onmessage = function(ev) {
       var mesg = JSON.parse(ev.data);
-      console.log(mesg);
 
       switch(mesg.type) {
       case "resAvailableChange":
@@ -62,11 +61,31 @@
   // startSession
   presentation_.startSession = function(urn, id) {
     var p = new Promise(function(resolve, reject){
-      presentation_.showPicker_(resolve, reject, urn, id);
+      console.log(urn);
+      presentation_.getDevices_(resolve, urn);
     });
 
     return p;
   }
+
+  // getDevices
+  presentation_.getDevices_ = function(resolve, urn) {
+    var xhr = new XMLHttpRequest();
+    var params = "urn="+encodeURIComponent(urn);
+
+    xhr.open('POST', '/discovery/getDevices');
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    // xhr.setRequestHeader("Content-length", params.length);
+    // xhr.setRequestHeader("Connection", "close");
+
+    xhr.onload = function(ev) {
+      console.log(xhr.responseText);
+      var devices = JSON.parse(xhr.responseText);
+      presentation_.showPicker_(resolve, urn, JSON.parse(devices));
+    }
+    xhr.send(params);
+  }
+
 
   // joinSession
   presentation_.joinSession = function(urn, id) {
@@ -80,30 +99,67 @@
 
 
   // show picker
-  presentation_.showPicker_ = function(resolve, reject, urn, id) {
-    var devices = this.devices_[urn] ? this.devices_[urn] : null;
+  presentation_.showPicker_ = function(resolve, urn, devices) {
     if(devices) {
       // fixme: negating id
-      this.showPicker__(resolve, reject, devices);
+      console.log(devices);
+      this.showPicker__(resolve, urn, devices);
     } else {
-      reject({"type": "error", "mesg": "no devices"});
+      // reject({"type": "error", "mesg": "no devices"});
     }
   }
           
 
   // show picker
-  presentation_.showPicker__ = function(resolve, reject, devices) {
-    var picker = document.createElement("div");
+  presentation_.showPicker__ = function(resolve, urn, devices) {
+    var picker = document.createElement("form");
     picker.style.width = "320px";
-    picker.style.height = "480px";
-    picker.style.backgroune  = "white";
-    picker.style.border  = "1px sold black";
+    picker.style.padding = "10px";
+    picker.style.background = "white";
+    picker.style.border  = "1px solid black";
     picker.style.position  = "absolute";
     picker.style.left = "100px";
     picker.style.top = "0px";
 
-    document.body.aapendChild(picker);
+    var html = "";
+    for(var uuid in devices) {
+      var device = devices[uuid];
+      html += "<label><input type='radio' data-urn='" + encodeURIComponent(urn) + "' data-uuid='" + encodeURIComponent(uuid) + "'>" + device.SERVER + "</label><br>";
+    }
+    html += "<input type='submit' value='select'>";
 
+    picker.innerHTML = html;
+
+    document.body.appendChild(picker);
+
+    picker.onsubmit = function(ev) {
+      ev.preventDefault();
+      var selected = document.querySelector("form input:checked");
+      console.dir(selected);
+      var urn = selected.dataset.urn;
+      var uuid = selected.dataset.uuid;
+
+      var xhr = new XMLHttpRequest();
+      var params = "urn="+urn+"&uuid="+uuid;
+
+      xhr.open('POST', '/discovery/setDevice');
+      xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      // xhr.setRequestHeader("Content-length", params.length);
+      // xhr.setRequestHeader("Connection", "close");
+
+      xhr.onload = function(ev) {
+        // just a debugging
+        var selected = JSON.parse(xhr.responseText);
+        console.log(selected);
+
+        /////////////////////////////////////////
+        var session = {}; // todo: ここで、さっくる作成のsessionオブジェクトを渡す
+        document.body.removeChild(picker);
+        resolve(session);
+      }
+      xhr.send(params);
+
+    }
   }
         
         
@@ -121,5 +177,4 @@
 }(window));
 
 if(true) {
-  navigator.presentation.startSession("urn", "id");
 }

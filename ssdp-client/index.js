@@ -20,6 +20,7 @@ var PAYLOAD_HEADER_SIZE = 128;
 // getDevices
 rest_server.post('/discovery/getDevices', function(req, res, next) {
   var urn = req.params.urn;
+  console.log("@getDevices - ", urn);
 
   var result = JSON.stringify(wotcontroller.getDevices(urn));
 
@@ -222,6 +223,9 @@ wss28887.on('connection', function(ws) {
     console.log(m.type);
     if(m.type === "reqAvailableChange") {
       console.log("@set event listener for " + m.type);
+
+      var device = wotcontroller.getDevices(SONY_CAMERA_URN);
+      if(JSON.stringify(device) !== "{}") ws.send(JSON.stringify({"type": "resAvailableChange", "devices": device}));
       wotcontroller.on("AvailableChange", function(ev) {
         var res = {
           "type": "resAvailableChange",
@@ -229,9 +233,12 @@ wss28887.on('connection', function(ws) {
         }
         console.log("@onavailablechange " + SONY_CAMERA_URN);
         console.dir(res);
-        ws.send(JSON.stringify(res));
+        if(ws) ws.send(JSON.stringify(res));
       });
     }
+  });
+  ws.on('close', function(){
+    wotcontroller.removeAllListeners();
   });
 });
 
