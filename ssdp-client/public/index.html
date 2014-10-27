@@ -66,7 +66,8 @@
     navigator.presentation.onavailablechange = function(){
       $("#button button")[0].disabled = false;
     }
-    document.querySelector("button#extern").onclick = function(){
+    document.querySelector("button#extern").onclick = function(e){
+      console.log(e);
       navigator.presentation
       .startSession('urn:schemas-sony-com:service:ScalarWebAPI:1')
       .then(function(sess) {
