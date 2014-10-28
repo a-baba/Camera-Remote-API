@@ -95,6 +95,16 @@
     return p;
   }
 
+ 
+  // stopSession
+  presentation_.stopSession = function(urn, id) {
+    var p = new Promise(function(resolve, reject){
+
+    });
+
+    return p;
+  }
+
 
   // show picker
   presentation_.showPicker_ = function(resolve, urn, devices) {
@@ -111,12 +121,13 @@
   presentation_.showPicker__ = function(resolve, urn, devices) {
 
     var button = document.querySelector("button#extern");
-    $("#picker").remove();
+    var old_picker = document.querySelector("#picker");
+    if(old_picker) old_picker.remove();
 
     var pos = $("#extern").offset();
     var picker = document.createElement("form");
     picker.id = "picker";
-    $(picker).css("top", pos.top - $("#picker").height());
+    picker.style.top = pos.top + "px";
 
     var html = "";
     for(var uuid in devices) {
@@ -127,6 +138,12 @@
     picker.innerHTML = html;
 
     document.body.appendChild(picker);
+
+    $(document).click(function(event) {
+      if (!$.contains($("#picker")[0], event.target)) {
+          $("#picker").remove();
+      }
+    });
 
     $(".candidate").on("click", function(ev){
       ev.preventDefault();
@@ -156,15 +173,6 @@
     });
   }
         
-        
-
-
-
-
-
-
-
-
   presentation_.init_();
 
   navigator.presentation = presentation_;
