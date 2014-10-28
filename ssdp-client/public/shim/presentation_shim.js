@@ -61,7 +61,6 @@
   // startSession
   presentation_.startSession = function(urn, id) {
     var p = new Promise(function(resolve, reject){
-      console.log(urn);
       presentation_.getDevices_(resolve, urn);
     });
 
@@ -79,7 +78,6 @@
     // xhr.setRequestHeader("Connection", "close");
 
     xhr.onload = function(ev) {
-      console.log(xhr.responseText);
       var devices = JSON.parse(xhr.responseText);
       presentation_.showPicker_(resolve, urn, JSON.parse(devices));
     }
@@ -102,7 +100,6 @@
   presentation_.showPicker_ = function(resolve, urn, devices) {
     if(devices) {
       // fixme: negating id
-      console.log(devices);
       this.showPicker__(resolve, urn, devices);
     } else {
       // reject({"type": "error", "mesg": "no devices"});
@@ -112,31 +109,28 @@
 
   // show picker
   presentation_.showPicker__ = function(resolve, urn, devices) {
+
+    var button = document.querySelector("button#extern");
+    $("#picker").remove();
+
+    var pos = $("#extern").offset();
     var picker = document.createElement("form");
-    picker.style.width = "320px";
-    picker.style.padding = "20px 10px";
-    picker.style.background = "white";
-    picker.style.border  = "1px solid black";
-    picker.style.position  = "absolute";
-    picker.style.zIndex  = "10240";
-    picker.style.left = "100px";
-    picker.style.top = "0px";
+    picker.id = "picker";
+    $(picker).css("top", pos.top - $("#picker").height());
 
     var html = "";
     for(var uuid in devices) {
       var device = devices[uuid];
-      html += "<label><input type='radio' data-urn='" + encodeURIComponent(urn) + "' data-uuid='" + encodeURIComponent(uuid) + "'>" + device.SERVER + "</label><br>";
+      html += "<label class='candidate' data-urn='" + encodeURIComponent(urn) + "' data-uuid='" + encodeURIComponent(uuid) + "'>" + device.SERVER + "</label><br>";
     }
-    html += "<input type='submit' value='select'>";
 
     picker.innerHTML = html;
 
     document.body.appendChild(picker);
 
-    picker.onsubmit = function(ev) {
+    $(".candidate").on("click", function(ev){
       ev.preventDefault();
-      var selected = document.querySelector("form input:checked");
-      console.dir(selected);
+      var selected = ev.target;
       var urn = selected.dataset.urn;
       var uuid = selected.dataset.uuid;
 
@@ -151,7 +145,6 @@
       xhr.onload = function(ev) {
         // just a debugging
         var selected = JSON.parse(xhr.responseText);
-        console.log(selected);
 
         /////////////////////////////////////////
         var session = new Session(); // todo: ここで、さっくる作成のsessionオブジェクトを渡す
@@ -160,7 +153,7 @@
       }
       xhr.send(params);
 
-    }
+    });
   }
         
         

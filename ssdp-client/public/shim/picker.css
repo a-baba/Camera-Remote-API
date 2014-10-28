@@ -1,0 +1,25 @@
+#picker{
+	width: 320px;
+	padding: 20px 0px;
+	position: absolute;
+	z-index: 10240;
+	left: 167.546875px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border-bottom-left-radius: 5px;
+	box-shadow: rgba(137, 131, 131, 0.4) 0px 0px 10px 5px;
+	background: white;
+}
+
+#picker label{
+	width: 100%;
+	padding: 0px 20px;
+}
+
+#picker label:hover{
+
+	background-color: rgb(4, 121, 255);
+	color: white;
+
+}
