@@ -16,6 +16,7 @@
   presentation_.init_ = function(){
     this.ws_ = null;   // websocket instance for node shim
     this.devices_ = {}; // store device list
+    this.playing_ = {};
 
     this.start_();
   }
@@ -95,16 +96,6 @@
     return p;
   }
 
- 
-  // stopSession
-  presentation_.stopSession = function(urn, id) {
-    var p = new Promise(function(resolve, reject){
-
-    });
-
-    return p;
-  }
-
 
   // show picker
   presentation_.showPicker_ = function(resolve, urn, devices) {
@@ -119,6 +110,8 @@
 
   // show picker
   presentation_.showPicker__ = function(resolve, urn, devices) {
+
+    var self = this;
 
     var button = document.querySelector("button#extern");
     var old_picker = document.querySelector("#picker");

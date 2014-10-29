@@ -42,12 +42,28 @@ var Session = {};
 
 	
 	Session.prototype.onstatechange = function(){
-		console.log("onstatechange : " + this.state);
+
+		var self = this;
+		console.log("onstatechange : " + self.state);
+
+		  switch (self.state) {
+          case 'connected':
+            self.postMessage("getLiveView");
+            break;
+          case 'disconnected':
+            console.log('Disconnected.');
+            break;
+        }
 	};
+	
 	
 
 	Session.prototype.onmessage = function(mesg){
 		console.log("onmessage : " + mesg);
+
+		
+        var url = window.URL.createObjectURL(mesg.data);
+        $("#liveview").attr("src", url);
 	}; 
 
 	Session.prototype.postMessage = function(mesg){
@@ -56,6 +72,17 @@ var Session = {};
 
 		var data = {};
 		data.message = mesg;
+
+    	ws.send(JSON.stringify(data));
+
+	};
+
+	Session.prototype.close = function(){
+
+		console.log("session.close()");
+
+		var data = {};
+		data.message = "CloseSession";
 
     	ws.send(JSON.stringify(data));
 

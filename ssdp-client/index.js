@@ -30,15 +30,23 @@ rest_server.post('/discovery/getDevices', function(req, res, next) {
 
 // setDevice
 rest_server.post('/discovery/setDevice', function(req, res, next) {
+  console.log("post")
   var urn = req.params.urn
     , uuid = req.params.uuid
 
   wotcontroller.setDevice(urn, uuid);
   var device = wotcontroller.getSelected(urn);
 
+  if(plug){
+    plug.destroy_flag = true;
+  }
+
   plug = new SONY_CameraAPI(device);
+  console.log(plug);
   res.send(JSON.stringify(device));
   next();
+
+
 });
 
 ///////////////////////////////////////////
@@ -59,7 +67,6 @@ rest_server.get(/.*/, restify.serveStatic({
 var plug;
 
 wss.on('connection', function(ws) {
-  console.dir(ws);
 
   ws.on('close', function(){
     plug.destroy();
@@ -82,9 +89,8 @@ wss.on('connection', function(ws) {
 
       var urn = m.urn
         , uuid = m.uuid;
-    console.log(urn);
-    console.log(uuid);
-
+      console.log(urn);
+      console.log(uuid);
 
       wotcontroller.setDevice(urn, uuid);
       var device = wotcontroller.getSelected(urn);
@@ -94,8 +100,11 @@ wss.on('connection', function(ws) {
       ws.send(JSON.stringify(device));
       //next();
     }
-    if(m.message == "getLiveView"){
+    else if(m.message == "getLiveView"){
       method = "liveview";
+    }
+    else if(m.message == "stopSession"){
+      method = "CloseSession";
     }
 
     switch(method){
@@ -139,12 +148,14 @@ wss.on('connection', function(ws) {
 
             // fixme (start_byte === 255 && payload_type === 1)
             if(start_byte.toString(16) == "ff" &&  payload_type.toString(16) == "1"){
+              /*
               console.log("This is Common Header! ----------------------------");
 
               console.log("start_byte: " + start_byte.toString(16));
               console.log("payload_type: " + payload_type.toString(16));
               console.log("sequence_number: " + sequence_number);
               console.log("time_stamp: " + time_stamp);
+              */
 
               common_header_flag = true;
 
@@ -173,20 +184,24 @@ wss.on('connection', function(ws) {
             }
 
             if(start_code1.toString(16) == "24" &&  start_code2.toString(16) == "35" &&  start_code3.toString(16) == "68" &&  start_code4.toString(16) == "79"){
-              console.log("This is Payload Header! ----------------------------");
 
-              console.log("start_code: " + start_code1.toString(16) + " " + start_code2.toString(16) + " " + start_code3.toString(16) + " " + start_code4.toString(16));
+              //console.log("This is Payload Header! ----------------------------");
+
+              //console.log("start_code: " + start_code1.toString(16) + " " + start_code2.toString(16) + " " + start_code3.toString(16) + " " + start_code4.toString(16));
 
               var jpeg_data_size = 0;
               if(jpeg_data_size1 > 0) jpeg_data_size += jpeg_data_size1 * 256 * 256;
               if(jpeg_data_size2 > 0) jpeg_data_size += jpeg_data_size2 * 256;
               if(jpeg_data_size3 > 0) jpeg_data_size += jpeg_data_size3;
+
+              /*
               console.log("jpeg_data_size: " + jpeg_data_size);
               
               console.log("padding_size: " + padding_size);
               console.log("reserved1: " + reserved1.toString(16));
               console.log("flag: " + flag.toString(16));
               console.log("reserved2: " + reserved2.toString(16));
+              */
 
               img_data_size = jpeg_data_size;
 
@@ -213,12 +228,12 @@ wss.on('connection', function(ws) {
           //オフセットを調整
           img_off += ( data.length - begin );
           var datasize = data.length - begin;
-          console.log("datasize: " + datasize);
-          console.log("offset: " + img_off);
+          //console.log("datasize: " + datasize);
+          //console.log("offset: " + img_off);
 
           //JPEGデータが集まったらWSで送る
           if(img_data_size <= img_off){
-            console.log("send array buffer");
+            //console.log("send array buffer");
             if(ws.readyState === 1){
               ws.send(img_ab);
             }
@@ -226,6 +241,11 @@ wss.on('connection', function(ws) {
         });
       });
 
+      break;
+
+    case "CloseSession":
+      console.log("close this session!!");
+      ws.close();
       break;
     default:
       break;
