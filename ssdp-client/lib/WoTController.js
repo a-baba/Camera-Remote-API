@@ -89,30 +89,3 @@ WoTController.prototype.startConsole = function(){
 
 module.exports = WoTController;
 
-
-if(process.argv[1].match("WoTcontroller.js")) {
-
-  WoTController.init();
-  var urn = "urn:schemas-sony-com:service:ScalarWebAPI:1";
-
-  WoTController.setDevice(urn, "uuid:00000000-0005-0010-8000-fcc2de538943::urn:schemas-sony-com:service:ScalarWebAPI:1"); 
-
-  var device = WoTController.get(urn);
-  
-  switch(urn) {
-  case "urn:schemas-sony-com:service:ScalarWebAPI:1":
-    var plug = new SONY_CameraAPI(device);
-    console.log(plug);
-    break;
-  default:
-    console.log("unknown urn");
-  }
-
-  console.log(plug.getDevice());
-  setTimeout(function(e){
-    console.log(plug.getEndpoints());
-
-    console.log(plug.get("getShootMode"));
-  }, 2000);
-
-}

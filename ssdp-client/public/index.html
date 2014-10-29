@@ -96,6 +96,12 @@
         }
       };
 
+      function stopPresent() {
+        if (!session) return;
+        session.close();
+        delete localStorage['presentationId'];
+      };
+
       session.onmessage = function(mesg) {
         var url = window.URL.createObjectURL(mesg.data);
         $("#liveview").attr("src", url);
